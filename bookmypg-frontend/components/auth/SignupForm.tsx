@@ -1,8 +1,9 @@
 "use client";
 
-import React, { useState } from "react";
+import React, { useEffect, useState } from "react";
 import { Button, Checkbox, Form, Input, Typography, theme, Grid } from "antd";
 import { UserOutlined, MailOutlined, LockOutlined } from "@ant-design/icons";
+import PhoneInput from "antd-phone-input";
 
 const { Title, Text, Link } = Typography;
 const { useToken } = theme;
@@ -11,6 +12,7 @@ const { useBreakpoint } = Grid;
 interface SignupFormValues {
   fullName: string;
   email: string;
+  phone: number;
   password: string;
   agreement: boolean;
 }
@@ -21,7 +23,7 @@ export default function AnimatedSignupForm() {
   const screens = useBreakpoint();
 
   // "slide-down" animation effect on mount
-  React.useEffect(() => {
+  useEffect(() => {
     const timeout = setTimeout(() => setShow(true), 100);
     return () => clearTimeout(timeout);
   }, []);
@@ -35,30 +37,42 @@ export default function AnimatedSignupForm() {
     borderRadius: screens.md ? token.borderRadiusLG : 0,
     boxShadow: screens.md ? token.boxShadowTertiary : "none",
     margin: "0 auto",
-    padding: screens.md ? `${token.paddingXL}px` : `${token.sizeXXL}px ${token.padding}px`,
+    padding: screens.md
+      ? `${token.paddingXL}px`
+      : `${token.sizeXXL}px ${token.padding}px`,
     width: "360px",
     // Animation styles
     opacity: show ? 1 : 0,
     transform: show ? "translateY(0)" : "translateY(-40px)",
-    transition: "all 0.7s cubic-bezier(.77,0,.18,1)"
+    transition: "all 0.7s cubic-bezier(.77,0,.18,1)",
   };
 
   return (
     <section
       style={{
         alignItems: "center",
-        backgroundColor: screens.md ? token.colorBgLayout : token.colorBgContainer,
+        backgroundColor: screens.md
+          ? token.colorBgLayout
+          : token.colorBgContainer,
         display: "flex",
         height: screens.md ? "100vh" : "auto",
-        padding: screens.md ? `${token.sizeXXL}px 0px` : "0px"
+        padding: screens.md ? `${token.sizeXXL}px 0px` : "0px",
       }}
     >
       <div style={panelStyle}>
         <div style={{ marginBottom: token.marginXL, textAlign: "center" }}>
-          <Title style={{ fontSize: screens.md ? token.fontSizeHeading2 : token.fontSizeHeading3 }}>
+          <Title
+            style={{
+              fontSize: screens.md
+                ? token.fontSizeHeading2
+                : token.fontSizeHeading3,
+            }}
+          >
             Sign Up
           </Title>
-          <Text type="secondary">Join us! Create an account to get started.</Text>
+          <Text type="secondary">
+            Join us! Create an account to get started.
+          </Text>
         </div>
         <Form
           name="signup"
@@ -70,15 +84,43 @@ export default function AnimatedSignupForm() {
           <Form.Item
             label="Full Name"
             name="fullName"
-            rules={[{ required: true, message: "Please input your full name!" }]}
+            rules={[
+              { required: true, message: "Please input your full name!" },
+            ]}
           >
             <Input prefix={<UserOutlined />} placeholder="Full Name" />
           </Form.Item>
           <Form.Item
+            name="phone"
+            label="Phone Number"
+            rules={[
+              {
+                required: true,
+                message: "Please enter your phone number",
+              },
+              {
+                validator: (_, value) => {
+                  if (!value) return Promise.resolve();
+                  if (value.valid) {
+                    return Promise.resolve();
+                  }
+                  return Promise.reject("Please enter a valid phone number");
+                },
+              },
+            ]}
+          >
+            <PhoneInput country="in" placeholder="Enter phone number" />
+          </Form.Item>
+
+          <Form.Item
             label="Email"
             name="email"
             rules={[
-              { type: "email", required: true, message: "Please input a valid email!" }
+              {
+                type: "email",
+                required: true,
+                message: "Please input a valid email!",
+              },
             ]}
           >
             <Input prefix={<MailOutlined />} placeholder="Email" />
@@ -88,18 +130,19 @@ export default function AnimatedSignupForm() {
             name="password"
             rules={[{ required: true, message: "Please input your password!" }]}
           >
-            <Input.Password
-              prefix={<LockOutlined />}
-              placeholder="Password"
-            />
+            <Input.Password prefix={<LockOutlined />} placeholder="Password" />
           </Form.Item>
           <Form.Item
             name="agreement"
             valuePropName="checked"
-            rules={[{
-              validator: (_, value) =>
-                value ? Promise.resolve() : Promise.reject(new Error("You must agree to terms!"))
-            }]}
+            rules={[
+              {
+                validator: (_, value) =>
+                  value
+                    ? Promise.resolve()
+                    : Promise.reject(new Error("You must agree to terms!")),
+              },
+            ]}
           >
             <Checkbox>
               I have read and agree to the{" "}
